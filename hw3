@@ -1,0 +1,198 @@
+# Assign #3: Oct Mock Exam 暨选做题目满百
+Updated 1537 GMT+8 Oct 10, 2024
+2024 fall, Complied by 生命科学学院陈宣之==（请改为同学的姓名、院系）==
+**说明：**
+1）Oct 月考： AC6==（请改为同学的通过数）== “AC4 ”。考试题目都在 题库（包括计概、数算题目） 里面，按照
+数字题号能找到，可以重新提交。作业中提交 最满意版本的代码和截图。自己
+2）请把每个题目解题思路（可选），源码 Python, 或者 C++/C（已经在 Codeforces/Openjudge 上 AC），
+截图（包含 Accepted, 学号），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或
+者用 word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+3）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、作业评论有 md 或者 doc。
+4）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### E28674:《黑神话：悟空》之加密
+http://cs101.openjudge.cn/practice/28674/
+思路：先检测是大写还是小写，然后检测k，26为一轮，k%26保证平移不到一轮，若平移至a之前则加26从z继续
+代码
+```
+k = int(input())
+s = input()for i in s:
+    if 65<=ord(i)<=90:
+        if ord(i)-k%26<65:
+            i=chr(ord(i)+26-k%26)
+        else:
+            i=chr(ord(i)-k%26)
+    else:
+        if ord(i)-k%26<97:
+            i = chr(ord(i) + 26 - k % 26)
+        else:
+            i = chr(ord(i) - k % 26)
+    print(i,end="")
+
+```
+代码运行截图 
+====
+### E28691: 字符串中的整数求和
+http://cs101.openjudge.cn/practice/28691/
+思路：存成字符串后截取前两位转为整形后相加
+代码
+```
+a,b=map(str,input().split())
+a1=int(a[0:2])
+b1=int(b[0:2])print(a1+b1)
+
+```
+代码运行截图 
+====
+### M28664: 验证身份证号
+http://cs101.openjudge.cn/practice/28664/
+思路：将系数存为列表，循环读入前17位乘以系数求和，求余11与最后一位比较
+代码
+```
+n=int(input())
+coefficient=[7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2]
+verify=["1","0","X","9","8","7","6","5","4","3","2"]for i in range(n):
+    card=input()
+    judge=True
+    count=0
+    for j in range(17):
+        count+=int(card[j])*coefficient[j]
+    if verify[count%11]==card[-1]:
+        print("YES")
+    else:
+        print("NO")
+
+```
+代码运行截图
+ ====
+### M28678: 角谷猜想
+http://cs101.openjudge.cn/practice/28678/
+思路：
+代码
+```
+n=int(input())while n>1:
+    if n%2==0:
+        print(n,"/",2,"=",n//2,sep="")
+        n//=2
+    else:
+        print(n,"*",3,"+",1,"=",n*3+1,sep="")
+        n=n*3+1print("End")
+
+```
+代码运行截图 
+====
+### M28700: 罗马数字与整数的转换
+http://cs101.openjudge.cn/practice/28700/
+思路：自建两个函数，罗马转希腊（代码写反了hhh）：读入字符串，找字符串中含4和9的特殊组合，加入后删去，然后从头开始读MDCLXVI
+希腊转罗马：M个数为千位的个数，即整除1000，而后求余1000去掉千位，然后求余100，判断百位上是否是4或9，大于等于5或小于5，十位百位类似
+##### 代码
+```
+def greece_to_roman(num):
+    count=0
+    if "CM" in num:
+        count+=900
+        num=num.replace("CM","")
+    if "CD" in num:
+        count+=400
+        num=num.replace("CD","")
+    if "XC" in num:
+        count+=90
+        num=num.replace("XC","")
+    if "XL" in num:
+        count+=40
+        num=num.replace("XL","")
+    if "IX" in num:
+        count+=9
+        num=num.replace("IX","")
+    if "IV" in num:
+        count+=4
+        num=num.replace("IV","")
+    for i in num:
+        if i=="M":
+            count+=1000
+        elif i=="D":
+            count+=500
+        elif i=="C":
+            count+=100
+        elif i=="L":
+            count+=50
+        elif i=="X":
+            count+=10
+        elif i=="V":
+            count+=5
+        elif i=="I":
+            count+=1
+    print(count)
+def roman_to_greece(num):
+    if num//1000>0:
+        print("M"*(num//1000),end="")
+        num=num%1000
+    hundred=num//100
+    if hundred>0:
+        if hundred==9:
+            print("CM",end="")
+        elif hundred==4:
+            print("CD",end="")
+        elif hundred>=5:
+            print("D"+"C"*(hundred-5),end="")
+        else:
+            print("C"*hundred, end="")
+        num=num%100
+    ten=num//10
+    if ten>0:
+        if ten==9:
+            print("XC",end="")
+        elif ten==4:
+            print("XL",end="")
+        elif ten>=5:
+            print("L"+"X"*(ten-5),end="")
+        else:
+            print("X"*ten,end="")
+        num=num%10
+    if num>0:
+        if num==9:
+            print("IX",end="")
+        elif num==4:
+            print("IV")
+        elif num>=5:
+            print("V"+"I"*(num-5),end="")
+        else:
+            print("I"*num,end="")
+
+n=input()if 65<=ord(n[0])<=90:
+    greece_to_roman(n)else:
+    roman_to_greece(int(n))
+
+#
+```
+代码运行截图 
+====
+### *T25353: 排队 （选做）
+http://cs101.openjudge.cn/practice/25353/
+思路：每一轮找到能够移动到最前面的所有人，排序后存入（超时）
+代码
+```
+n,d=map(int,input().split())
+original_list=list(map(int,input().split()))
+new_list=[]while len(original_list)>0:
+    temp_list=[]
+    for i in range(len(original_list)):
+        judge=True
+        for j in range(i):
+            if abs(original_list[i]-original_list[j])>d:
+                judge=False
+                break
+        if judge:
+            temp_list.append(original_list[i])
+    temp_list.sort()
+    new_list=new_list+temp_list
+    for i in temp_list:
+        original_list.remove(i)for i in new_list:
+    print(i,end=" ")
+
+```
+代码运行截图 
+====
+## 2. 学习总结和收获
+==考试的时候前四题都比较简单，第一题的坑点也很快排除了，但到了罗马就有点乱了，原来的思路写出来比较复杂，存作列表从头开始读，用分支语句列出所有可能情况，出了很多错误，在原来基础上debug越写越迷惑，花了一个小时也没解决，回来后从头开始写（也有AI自动填充帮助），思路变得清晰很多，很快就AC了，排队跟同学请教了后了解了思路，但是超时；每日一练除了有些难题暂时还没AC已经跟上进度了，简单双指针和矩阵很快找到诀窍，有关算法的难题遇到了困难==
