@@ -1,0 +1,361 @@
+# Assignment #D: 十全十美
+Updated 1254 GMT+8 Dec 17, 2024
+2024 fall, Complied by 陈宣之 生命科学学院
+**说明：**
+1）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截
+图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用
+word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+2）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+3）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### 02692: 假币问题
+brute force, http://cs101.openjudge.cn/practice/02692
+思路：
+1.字典判断，将所有字母的值都设为float(“inf”)，若even，则左右两边均设为0，一定正常；若up，则左边可能为heavy，若被确定设为0或是之前认为可能为light，则设为0，一定正常，右边同理；down同理，找到值为非0的键（未AC）
+2.集合运算初始化全部都有可能为heavy或light。even则左右为normal，up则heavy只可能在左边四个之一，light只可能在右边四个之一，剩下四个一定为normal，down同理。再从heavy和light集合中去掉normal。
+代码：
+```
+1.
+n=int(input())
+dict1={"A":float("inf"),"B":float("inf"),"C":float("inf"),"D":float("inf"),"E":float("inf"),"F":float("inf"),"G":float("inf"),"H":float("inf"),"I":float("inf"),"J":float("inf"),"K":float("inf"),"L":float("inf")}
+for i in range(n):
+    for a in range(3):
+        left,right,judge=input().split()
+        if judge=="even":
+            for j in left:
+                dict1[j]=0
+            for j in right:
+                dict1[j]=0
+        if judge=="up":
+            flag=set()
+            for j in left:
+                flag.add(j)
+                if dict1[j]==0:
+                    continue
+                elif dict1[j]==-1:
+                    dict1[j]=0
+                else:
+                    dict1[j]=1
+            for j in right:
+                flag.add(j)
+                if dict1[j]==0:
+                    continue
+                elif dict1[j]==1:
+                    dict1[j]=0
+                else:
+                    dict1[j]=-1
+            for j in "ABCDEFGHIJKL":
+                if j not in flag:
+                    dict1[j]=0
+        if judge=="down":
+            flag=set()
+            for j in left:
+                flag.add(j)
+                if dict1[j]==0:
+                    continue
+                elif dict1[j]==1:
+                    dict1[j]=0
+                else:
+                    dict1[j]=-1
+            for j in right:
+                flag.add(j)
+                if dict1[j]==0:
+                    continue
+                elif dict1[j]==-1:
+                    dict1[j]=0
+                else:
+                    dict1[j]=1
+            for j in "ABCDEFGHIJKL":
+                if j not in flag:
+                    dict1[j]=0
+
+    for j in "ABCDEFGHIJKL":
+        if dict1[j]!=0:
+            if dict1[j]==1:
+                weight="heavy"
+            else:
+                weight="light"
+            print(j," is the counterfeit coin and it is ",weight,".",sep="")
+            break
+
+2.
+n=int(input())for i in range(n):
+    heavy,light,normal=set("ABCDEFGHIJKL"),set("ABCDEFGHIJKL"),set()
+    for a in range(3):
+        left,right,judge=input().split()
+        if judge=="even":
+            normal=normal | (set(left) | set(right))
+        if judge=="up":
+            normal=normal | (set("ABCDEFGHIJKL")-(set(left) | set(right)))
+            heavy=heavy & set(left)
+            light=light & set(right)
+        if judge=="down":
+            normal=normal | (set("ABCDEFGHIJKL")-(set(left) | set(right)))
+            heavy=heavy & set(right)
+            light=light & set(left)
+    heavy=heavy-normal
+    light=light-normal
+    if len(heavy)==1:
+        print(list(heavy)[0],"is the counterfeit coin and it is heavy.")
+    else:
+        print(list(light)[0],"is the counterfeit coin and it is light.")
+
+```
+代码运行截图
+### 01088: 滑雪
+dp, dfs similar, http://cs101.openjudge.cn/practice/01088
+思路：用二维dp数组存储该位置最大路径，dfs搜索，若为0则未经过，继续递推，若不为0，则可以用该位置存储的最大路径加一
+代码：
+```
+import sys
+sys.setrecursionlimit(10**6)
+r,c=map(int,input().split())
+graph=[list(map(int,input().split())) for i in range(r)]
+
+dp=[[0 for i in range(c)] for j in range(r)]def dfs(x,y):
+    global graph,dp,max_step
+    for dx,dy in [(0,1),(0,-1),(1,0),(-1,0)]:
+        nx,ny=x+dx,y+dy
+        if 0<=nx<r and 0<=ny<c and graph[x][y]>graph[nx][ny]:
+            if dp[nx][ny]==0:
+                dfs(nx,ny)
+            dp[x][y]=max(dp[x][y],dp[nx][ny]+1)
+    if dp[x][y]==0:
+        dp[x][y]=1
+
+
+max_step=1for i in range(r):
+    for j in range(c):
+        if dp[i][j]==0:
+            dfs(i,j)
+        max_step=max(max_step,dp[i][j])print(max_step)
+
+```
+代码运行截图 
+
+### 25572: 螃蟹采蘑菇
+bfs, dfs, http://cs101.openjudge.cn/practice/25572/
+思路：判断一下是横还是竖，然后bfs
+代码：
+```
+from collections import deque
+
+n=int(input())
+matrix=[list(map(int,input().split())) for i in range(n)]
+loc=[-1,-1]
+way=""for i in range(n):
+    for j in range(n):
+        if matrix[i][j]==5:
+            loc[0]=i
+            loc[1]=j
+            if j==n-1:
+                way="v"
+            else:
+                if matrix[i][j+1]==5:
+                    way="h"
+                else:
+                    way="v"
+            break
+    if loc[0]!=-1:
+        break
+
+def bfs(i,j,way):
+    q=deque()
+    inq=set()
+    q.append((i,j))
+    inq.add((i,j))
+    if way=="h":
+        while q:
+            x,y=q.popleft()
+            if matrix[x][y]==9 or matrix[x][y+1]==9:
+                return True
+            for dx,dy in [(1,0),(0,1),(-1,0),(0,-1)]:
+                nx,ny=x+dx,y+dy
+                if 0<=nx<n and 0<=ny<n-1 and (nx,ny) not in inq :
+                    if matrix[nx][ny]!=1 and matrix[nx][ny+1]!=1:
+                        inq.add((nx,ny))
+                        q.append((nx,ny))
+    else:
+        while q:
+            x, y = q.popleft()
+            if matrix[x][y]==9 or matrix[x+1][y]==9:
+                return True
+            for dx,dy in [(1,0),(0,1),(-1,0),(0,-1)]:
+                nx,ny=x+dx,y+dy
+                if 0<=nx<n-1 and 0<=ny<n and (nx,ny) not in inq :
+                    if matrix[nx][ny]!=1 and matrix[nx+1][ny]!=1:
+                        inq.add((nx,ny))
+                        q.append((nx,ny))
+    return Falseif bfs(loc[0],loc[1],way):
+    print("yes")else:
+    print("no")
+
+```
+代码运行截图
+### 27373: 最大整数
+dp, http://cs101.openjudge.cn/practice/27373/
+思路：先对列表进行排序（不能用字典序），以长度作为重量做01背包
+代码：
+```
+m=int(input())
+n=int(input())
+arr=list(input().split())
+arr.sort(key=lambda x:x*10,reverse=True)
+dp=[[""]*(m+1) for i in range(n)]for i in range(n):
+    for j in range(1,m+1):
+        if len(arr[i])<=j:
+            dp[i][j]=str(max(int(dp[i-1][j]) if dp[i-1][j]!="" else 0,int(dp[i-1][j-len(arr[i])]+arr[i])))
+        else:
+            dp[i][j]=dp[i-1][j]
+print(dp[n-1][m])
+
+```
+代码运行截图
+
+### 02811: 熄灯问题
+brute force, http://cs101.openjudge.cn/practice/02811
+思路：
+1.lambs存储初状态，dfs遍历第一行所有可能（2^6），接下来每一行确保上一行熄灭，状态确定，最后判断最后一行是否都熄灭，存为ans输出（未AC）
+2.用temp存储状态，press函数更新当该点按下后的状态，其余同上（未AC）
+3.同学帮忙修改
+代码：
+```
+1.
+from copy import deepcopy
+lambs=[[0]*8]for i in range(5):
+    lambs.append([0]+list(map(int,input().split()))+[0])
+lambs.append([0]*8)
+output=[[-1]*8 for _ in range(7)]
+ans=[[-1]*8 for _ in range(7)]def dfs(state,index):
+    global output,ans
+    if index==8:
+        for i in range(2,6):
+            for j in range(1,7):
+                output[i][j]=(lambs[i-1][j]+output[i-1][j]+output[i-1][j+1]+output[i-1][j-1]+output[i-2][j])%2
+        for j in range(1,7):
+            if (lambs[5][j]+output[5][j]+output[5][j+1]+output[5][j-1]+output[4][j])%2==1:
+                break
+        else:
+            ans=deepcopy(output)
+        return
+    output[1][index]=state
+    dfs(0,index+1)
+    dfs(1,index+1)
+
+dfs(0,1)dfs(1,1)for i in range(1,6):
+    print(*ans[i][1:-1])
+
+2.
+from copy import deepcopydef press(i,j,matrix):
+    for x,y in [(i,j),(i-1,j),(i+1,j),(i,j-1),(i,j+1)]:
+        if 0<=x<5 and 0<=y<6:
+            matrix[x][y]=(matrix[x][y]+1)%2
+lambs=[list(map(int,input().split())) for _ in range(5)]
+ans=[[0]*6 for _ in range(5)]
+def dfs(state,index):
+    global ans,first_line,lambs
+    if index==6:
+        output=[first_line,[0]*6,[0]*6,[0]*6,[0]*6]
+        temp=deepcopy(lambs)
+        for i in range(6):
+            if first_line[i]:
+                press(i,0,temp)
+
+        for i in range(4):
+            for j in range(6):
+                if temp[i][j]==1:
+                    press(i+1,j,temp)
+                    output[i+1][j]=1
+
+        if all(light==0 for light in lambs[4]):
+            ans=deepcopy(output)
+        return
+    first_line[index]=state
+    dfs(0,index+1)
+    dfs(1,index+1)
+
+first_line=[-1]*6dfs(0,0)dfs(1,0)for i in range(5):
+print(*ans[i])
+
+3.
+from copy import deepcopy
+lambs=[[0]*8]for i in range(5):
+    lambs.append([0]+list(map(int,input().split()))+[0])
+lambs.append([0]*8)
+output=[[0]*8 for _ in range(7)]
+ans=[[0]*8 for _ in range(7)]
+temp=[[0]*8 for _ in range(7)]
+line1=[0]*8
+
+def turn(a,b,x):
+    global temp
+    temp[a][b]=abs(temp[a][b]-x)
+    temp[a+1][b]=abs(temp[a+1][b]-x)
+    temp[a-1][b]=abs(temp[a-1][b]-x)
+    temp[a][b+1]=abs(temp[a][b+1]-x)
+    temp[a][b-1]=abs(temp[a][b-1]-x)
+def dfs():
+    global temp,output,ans
+    temp=deepcopy(lambs)
+    for i0 in range(1,7):
+        turn(1,i0,output[1][i0])
+    for i in range(2,6):
+        for j in range(1,7):
+            output[i][j]=temp[i-1][j]
+            turn(i,j,output[i][j])
+    if 1 in temp[5][1:7]:
+        return 0
+    else:
+        ans=deepcopy(output)
+        return 1
+def line(a):
+    global output
+    if a==7:
+        output=deepcopy(ans)
+        output[1]=line1.copy()
+        if dfs()==1:
+            return
+    else:
+        for i in (0, 1):
+            line1[a] = i
+            line(a+1)
+line(1)for i in range(1,6):
+    print(*ans[i][1:-1])
+
+```
+代码运行截图
+### 08210: 河中跳房子
+binary search, greedy, http://cs101.openjudge.cn/practice/08210/
+思路：search函数判断最小长度为limit是否可行，1到L二分查找limit
+代码：
+```
+l,n,m=map(int,input().split())
+rocks=[0]for i in range(n):
+    rocks.append(int(input()))
+rocks.append(l)
+def search(least,m):
+    temp=0
+    limit=m
+    for i in range(1,n+2):
+        if rocks[i]-temp<least:
+            m-=1
+        else:
+            temp=rocks[i]
+    if m<0:
+        return 0
+    return 1
+
+lo=1
+hi=lwhile lo<=hi:
+    mid=(lo+hi)//2
+    if search(mid,m):
+        lo=mid+1
+    else:
+        hi=mid-1print(lo-1)
+
+```
+代码运行截图 
+
+## 2. 学习总结和收获
+作业真的好难qwq，熄灯问题到最后还没有自己debug出来，先把作业交上。前三道题还能做，最大整数就有点复杂了，背包问题真的变化好多。最后一道题倒是做过解法一样的
