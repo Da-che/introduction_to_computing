@@ -1,0 +1,193 @@
+# Assignment #A: dp & bfs
+Updated 2 GMT+8 Nov 25, 2024
+2024 fall, Complied by 陈宣之 生命科学学院
+**说明：**
+1）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截
+图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用
+word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+2）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+3）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### LuoguP1255 数楼梯
+dp, bfs, https://www.luogu.com.cn/problem/P1255
+思路：
+一级台阶有一种走法，二级台阶有两种，n级台阶（n>2）可由n-1或n-2走上，走法等于两者之和
+代码：
+```
+n=int(input())
+dp=[0]*(n+1)
+if n==1:
+    print(1)
+elif n==2:
+    print(2)
+else:
+    dp[1]=1
+    dp[2]=2
+    for i in range(3,n+1):
+        dp[i]=dp[i-1]+dp[i-2]
+    print(dp[n])
+```
+代码运行截图 
+### 27528: 跳台阶
+dp, http://cs101.openjudge.cn/practice/27528/
+思路：
+第n级台阶可以从第0到第n-1级台阶跳上来
+代码：
+```
+n=int(input())
+dp=[0]*(n+1)
+dp[0]=1
+dp[1]=1for i in range(2,n+1):
+    for j in range(i):
+        dp[i]+=dp[j]print(dp[n])
+
+```
+代码运行截图 
+
+### 474D. Flowers
+dp, https://codeforces.com/problemset/problem/474/D
+思路：
+在k以下的都只能吃红花，只有一种方案，在k以上的可以从i-1基础上吃一朵红花或从i-k基础上吃k朵白花，用前缀和打表
+代码：
+```
+t,k=map(int,input().split())
+dp=[0]*(10**5+1)
+dp[0]=1
+for i in range(1,k):
+    dp[i]=1
+for i in range(k,10**5+1):
+    dp[i]=(dp[i-k]+dp[i-1])%1000000007
+dp[0]=0
+for i in range(1,10**5+1):
+    dp[i]+=dp[i-1]
+for i in range(t):
+    a,b=map(int,input().split())
+    print((dp[b]-dp[a-1])%1000000007)
+```
+代码运行截图 
+
+### LeetCode5.最长回文子串
+dp, two pointers, string, https://leetcode.cn/problems/longest-palindromic-
+substring/
+思路：
+用二维dp存储从i到j是否是回文，dp[i][i]和dp[i-1][i]先遍历，以后就可用dp[i+1][j-1]和s[i]==s[j]判断，用max_length和lft存储最长的序列
+
+代码：
+```
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        dp=[[0]*(len(s)+1) for i in range(len(s)+1)]
+        lft=0
+        max_length=1
+        dp[0][0]=1
+        for i in range(1,len(s)):
+            dp[i][i]=1
+            if s[i]==s[i-1]:
+                dp[i-1][i]=1
+                lft=i-1
+                max_length=2
+        for l in range(3,len(s)+1):
+            for i in range(len(s)-l+1):
+                j=i+l-1
+                if dp[i+1][j-1] and s[i]==s[j]:
+                    dp[i][j]=1
+                    if l>max_length:
+                        lft=i
+                        max_length=l
+        return s[lft:lft+max_length]
+
+```
+代码运行截图
+### 12029: 水淹七军
+bfs, dfs, http://cs101.openjudge.cn/practice/12029/
+思路：
+用bfs，将水攻的点及水位全加入双端队列，向四个方向走，如果地势低于原水位，将该点以及原水位也加入双端队列，走到司令部即能被淹，若双端队列已判断完仍走不到司令部，即不被淹
+代码：
+```
+from collections import dequefrom sys import stdin
+directions=[(0,1),(0,-1),(1,0),(-1,0)]
+get=map(int,stdin.read().split())for _ in range(next(get)):
+    n,m=next(get),next(get)
+    graph=[[0]*m for i in range(n)]
+    for i in range(n):
+        for j in range(m):
+            graph[i][j]=next(get)
+    head=(next(get)-1,next(get)-1)
+    q=deque()
+    inq=set()
+    for k in range(next(get)):
+        x,y=next(get)-1,next(get)-1
+        q.append((x,y,graph[x][y]))
+        inq.add((x,y))
+    while q:
+        x,y,height=q.popleft()
+        if (x,y)==head:
+            print("Yes")
+            break
+        for dx,dy in directions:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<n and 0<=ny<m and (nx,ny) not in inq:
+                if graph[nx][ny]<height:
+                    q.append((nx,ny,height))
+                    inq.add((nx,ny))
+    else:
+        print("No")
+
+```
+代码运行截图 
+
+### 02802: 小游戏
+bfs, http://cs101.openjudge.cn/practice/02802/
+思路：
+Board多加一圈（不是保护圈），bfs四个方向，每个方向把能走的全加入队列算一步，直到找到终点
+代码：
+```
+from collections import deque
+def bfs(i1,j1,i2,j2):
+    global m,n
+    q=deque()
+    q.append([(i1,j1),0])
+    inq=set()
+    inq.add((i1,j1))
+    while q:
+        (x,y),step=q.popleft()
+        for dx,dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+            nx,ny=x+dx,y+dy
+            while True:
+                if nx==i2 and ny==j2:
+                    return str(step+1)+" segments."
+                if nx<0 or nx>=n+2 or ny<0 or ny>=m+2:
+                    break
+                if board[nx][ny]!=" ":
+                    break
+                if (nx,ny) not in inq:
+                    q.append([(nx,ny),step+1])
+                    inq.add((nx,ny))
+                nx,ny=nx+dx,ny+dy
+    return "impossible."
+
+
+test=0while True:
+    test+=1
+    m,n=map(int,input().split())
+    if m==0 and n==0:
+        break
+    print("Board #",test,":",sep="")
+    board=[[" "]*(m+2)]
+    for i in range(n):
+        board.append([" "]+list(input())+[" "])
+    board.append([" "]*(m+2))
+    pair=0
+    while True:
+        pair+=1
+        y1,x1,y2,x2=map(int,input().split())
+        if x1==0 and y1==0 and x2==0 and y2==0:
+            break
+        print("Pair ",pair,": ",bfs(x1,y1,x2,y2),sep="")
+    print()
+
+```
+代码运行截图
+## 2. 学习总结和收获
+作业题前几个dp都差不多，代码短，写的比较快；最长回文子串开始没看懂为什么是dp，看了提示才明白；两个bfs代码比较复杂，有点费事，但模板算是比较熟练了（虽然也有AI填充的功劳），水淹七军RE了好久，看了群聊之后第一次用sys.stdin.read()，小游戏在模板上有点变化，但也还行。跟跟每日一练。
