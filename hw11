@@ -1,0 +1,217 @@
+# Assignment #B: Dec Mock Exam 大雪前一天
+Updated 1649 GMT+8 Dec 5, 2024
+2024 fall, Complied by <mark>同学的姓名、院系</mark>
+**说明：**
+1 ）月考： AC6“AC2 ”。考试题目都在 题库（包括计概、数算题目） 里面，
+按照数字题号能找到，可以重新提交。作业中提交自己最满意版本的代码和截图。
+2）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截
+图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用
+word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+3）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+4）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### E22548: 机智的股民老张
+http://cs101.openjudge.cn/practice/22548/
+思路：用min_price记录遍历到的最小值，记录遍历的值与min_price的差的最大值
+代码：
+```
+price=list(map(int,input().split()))
+ans=0
+min_price=price[0]for i in range(1,len(price)):
+    if price[i]<min_price:
+        min_price=price[i]
+    ans=max(ans,price[i]-min_price)print(ans)
+
+```
+代码运行截图
+### M28701: 炸鸡排
+greedy, http://cs101.openjudge.cn/practice/28701/
+思路：自己没思路，看了群聊后发现根本没必要考虑每一块到底是按什么顺序炸，只要没有鸡排所需时间大于剩下的加和，总是有办法以total/k的时间把全部的炸熟，只要让那些“特别难炸”的鸡排全程占用锅就行了
+代码：
+```
+n,k=map(int,input().split())
+time=list(map(int,input().split()))
+time.sort()
+time.reverse()
+total=sum(time)while time[0]>total/k:
+    k-=1
+    if k==0:
+        break
+    total-=time[0]
+    time.pop(0)if k==0:
+    print("%.3f" % time[0])else:
+    print("%.3f" % (total/k))
+
+```
+代码运行截图 
+### M20744: 土豪购物
+dp, http://cs101.openjudge.cn/practice/20744/
+思路：
+pre和pre2是正反两个方向的前缀和，分别扫描两个方向，用dp和dp2存储扫描到的最小前缀和，ans记录最大的pre-dp，是不归还的最大值，然后遍历所有负数作为归还的商品，前半最大的价值是pre[j-1]-dp[j-1]，后半最大的价值是pre2[j+1]-dp[i+1]（注意第一位和最后一位），ans记录最大的加和。
+[但是因为dp记录的最小值可能是自身，似乎并未排除全都没买的情况，可能数据不全awa]
+
+代码：
+```
+price=list(map(int,input().split(",")))
+
+dp=[0]*(len(price)+1)
+pre=[0]+pricefor i in range(1,len(pre)):
+    pre[i]+=pre[i-1]
+ans=price[1]for i in range(1,len(pre)):
+    if pre[i]<dp[i-1]:
+        dp[i]=pre[i]
+    else:
+        dp[i]=dp[i-1]
+    ans=max(ans,pre[i]-dp[i])
+pre.pop(0)
+dp.pop(0)
+
+dp2=[0]*(len(price)+1)
+pre2=[0]+price[::-1]for i in range(1,len(pre2)):
+    pre2[i]+=pre2[i-1]for i in range(1,len(pre2)):
+    if pre2[i]<dp2[i-1]:
+        dp2[i]=pre2[i]
+    else:
+        dp2[i]=dp2[i-1]
+    ans=max(ans,pre2[i]-dp2[i])
+dp2.reverse()
+pre2.reverse()
+pre2.pop()
+dp2.pop()
+for j in range(len(price)):
+    if price[j]<0:
+        if j==0:
+            ans=max(ans,pre2[j+1]-dp2[j+1])
+        elif j==len(price)-1:
+            ans=max(ans,pre[j-1]-dp[j-1])
+        else:
+            ans=max(ans,pre[j-1]-dp[j-1]+pre2[j+1]-dp2[j+1])
+print(ans)
+
+```
+代码运行截图 
+### T25561: 2022 决战双十一
+brute force, dfs, http://cs101.openjudge.cn/practice/25561/
+思路：
+price二维列表存标价，不卖存成float(“inf”)，coupons列表存字典，每个字典是每个店铺的满减，再用target列表存列表是字典的key。Dfs遍历所有买法，index是当前处理的商品，each_shop存当前每个店铺买的总标价，当index==n时计算最后总价。
+代码：
+```
+n,m=map(int,input().split())
+prices=[[float("inf")]*m for i in range(n)]for i in range(n):
+    temp=list(input().split())
+    for j in range(len(temp)):
+        prices[i][int(temp[j][0])-1]=int(temp[j][2:])
+coupons=[]
+target=[]for i in range(m):
+    temp=input().split()
+    dictionary={}
+    target.append([])
+    for j in temp:
+        dictionary[int(j[:j.index('-')])]=int(j[j.index('-')+1:])
+        target[-1].append(int(j[:j.index('-')]))
+    target[-1].sort()
+    coupons.append(dictionary)
+
+ans=float('inf')
+def dfs(index,each_shop):
+    if index==n:
+        global ans,coupons,target
+        temp1=0
+        tianmao=50*(sum(each_shop)//300)
+        for i in range(m):
+            cnt=0
+            while target[i][cnt]<=each_shop[i]:
+                cnt+=1
+                if cnt==len(target[i]):
+                    break
+            cnt-=1
+            temp1+=each_shop[i]
+            if cnt>-1:
+                temp2=0
+                for l in range(cnt+1):
+                    temp2=max(temp2,coupons[i][target[i][l]])
+                temp1-=temp2
+        temp1-=tianmao
+        ans=min(ans,temp1)
+        return
+    else:
+        for i in range(m):
+            if prices[index][i]==float("inf"):
+                continue
+            each_shop[i]+=prices[index][i]
+            dfs(index+1,each_shop)
+            each_shop[i]-=prices[index][i]dfs(0,[0]*m)print(ans)
+
+```
+代码运行截图 
+### T20741: 两座孤岛最短距离
+dfs, bfs, http://cs101.openjudge.cn/practice/20741/
+思路：
+扫描到第一个1，dfs把连通的所有1的坐标全存入q，记作第0步，同时全部改为0，使得原地图只剩一个岛，然后再用bfs找到另一个岛
+代码：
+```
+from collections import deque
+n=int(input())
+graph=[]for i in range(n):
+    graph.append(list(input()))
+
+directions=[(0,1),(1,0),(0,-1),(-1,0)]
+q=deque()
+inq=set()def dfs(x,y):
+    global q,inq
+    stack=[(x,y)]
+    while stack:
+        x,y=stack.pop()
+        graph[x][y]="0"
+        q.append([(x,y),0])
+        inq.add((x,y))
+        for dx,dy in directions:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<n and 0<=ny<n:
+                if graph[nx][ny]=="1":
+                    stack.append((nx,ny))
+
+judge=Falsefor i in range(n):
+    for j in range(n):
+        if graph[i][j]=="1":
+            dfs(i,j)
+            judge=True
+            break
+    if judge:
+        break
+
+while q:
+    (x,y),step=q.popleft()
+    for dx,dy in directions:
+        nx,ny=x+dx,y+dy
+        if 0<=nx<n and 0<=ny<n and (nx,ny) not in inq:
+            if graph[nx][ny]=="1":
+                print(step)
+                exit()
+            else:
+                q.append([(nx,ny),step+1])
+                inq.add((nx,ny))
+
+```
+代码运行截图
+### T28776: 国王游戏
+greedy, http://cs101.openjudge.cn/practice/28776
+思路：
+完全想不到，看了题解qwq，以左右手乘积升序排队，自己用反证的方式证明了一下贪心思路的正确性
+代码：
+```
+n=int(input())
+king=tuple(map(int,input().split()))
+q=[]for i in range(n):
+    q.append(tuple(map(int,input().split())))
+q.sort(key=lambda x:(x[0]*x[1]))
+ans=0
+temp=king[0]for i in range(n):
+    temp*=q[i][0]
+    ans=max(temp//(q[i][0]*q[i][1]),ans)print(ans)
+
+```
+代码运行截图 
+## 2. 学习总结和收获
+这次月考一上来就懵了，第一题就卡好久；然后随便看了一下题目发现就两座孤岛比较熟悉，但是搜索确实要写好久，而且还是dfs加bfs；炸鸡排看了一下觉得很复杂就直接放弃了，原来不用考虑很多；土豪购物确实是比较复杂，用第一题的策略加上前缀和两遍扫描记录，分两种情况考虑，而且细节上也容易出错，考试后和同学讨论出思路，单单写出代码就花了快一个小时；本来AC2后还有三四十分钟，准备写决战双十一，还没写完输入就结束了，结束后自己又写了将近两个小时，dfs全遍历，思路简单实现麻烦；国王游戏真是想不出贪心思路，看了题解后证明了一下正确性，但是真的不知道要怎么想出来（悲）
