@@ -1,0 +1,195 @@
+# Assignment #C: 五味杂陈
+Updated 1148 GMT+8 Dec 10, 2024
+2024 fall, Complied by 陈宣之 生命科学学院
+**说明：**
+1）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截
+图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用
+word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+2）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+3）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### 1115. 取石子游戏
+dfs, https://www.acwing.com/problem/content/description/1117/
+思路：看了提示，其实实现很简单，dfs参数放当时的两堆石子数以及谁在操作就行，拿到到a//b>=2情形是胜者
+代码：
+```
+while True:
+    a,b=map(int, input().split())
+    if a==0 and b==0:
+        break
+    if a==b:
+        print("win")
+        continue
+    if a<b:
+        a,b=b,a
+    def pick(a,b,judge):
+        if a//b>=2:
+            return judge
+        else:
+            a,b=b,a-b
+            return pick(a,b,not judge)
+    if pick(a,b,True):
+        print("win")
+    else:
+        print("lose")
+```
+代码运行截图
+### 25570: 洋葱
+Matrices, http://cs101.openjudge.cn/practice/25570
+思路：用bfs，以最中间作为第一层向外搜索，q中记录层标，对应数据加入layers列表的对应层，然后取layers的最大值
+代码：
+```
+from collections import deque
+n=int(input())
+matrix=[]for i in range(n):
+    matrix.append(list(map(int,input().split())))
+layers=[0]*(n//2+1)
+directions=[(0,1),(1,0),(0,-1),(-1,0),(1,1),(-1,-1),(1,-1),(-1,1)]
+q=deque()
+inq=set()if n%2==1:
+    q.append([(n//2,n//2),0])
+    inq.add((n//2,n//2))else:
+    q.append([(n//2-1,n//2),0])
+    q.append([(n//2,n//2-1),0])
+    q.append([(n//2,n//2),0])
+    q.append([(n//2-1,n//2-1),0])
+    inq.add((n//2-1,n//2))
+    inq.add((n//2,n//2-1))
+    inq.add((n//2-1,n//2-1))
+    inq.add((n//2,n//2))while q:
+    (x,y),layer=q.popleft()
+    layers[layer]+=matrix[x][y]
+    for dx,dy in directions:
+        nx,ny=x+dx,y+dy
+        if 0<=nx<n and 0<=ny<n and (nx,ny) not in inq:
+            q.append([(nx,ny),layer+1])
+            inq.add((nx,ny))print(max(layers))
+
+```
+代码运行截图 
+### 1526C1. Potions(Easy Version)
+greedy, dp, data structures, brute force, *1500, https://codeforces.com/problemset/
+problem/1526/C1
+思路：dp键表示喝的药水数，值表示可能的最大生命值，遍历每瓶药水，dp滚动数组从后往前更新
+代码：
+```
+n=int(input())
+potions=list(map(int,input().split()))
+dp=[0]+[-1]*n
+for i in range(n):
+    for j in range(i+1,0,-1):
+        if dp[j-1]>=0:
+            dp[j]=max(dp[j],dp[j-1]+potions[i])
+for i in range(n,-1,-1):
+    if dp[i]>=0:
+        print(i)
+        break
+```
+代码运行截图 
+### 22067: 快速堆猪
+辅助栈，http://cs101.openjudge.cn/practice/22067/
+思路：用一个stack存猪，再用一个stack存迄今遇到的最小值（等号也算）
+代码：
+```
+stack=[]
+min_stack=[]while True:
+    try:
+        operation=input()
+        if operation=="pop":
+            if stack:
+                num=stack.pop()
+                if num==min_stack[-1]:
+                    min_stack.pop()
+        elif operation=="min":
+            if stack:
+                print(min_stack[-1])
+        else:
+            num=int(operation[operation.index(" ")+1:])
+            stack.append(num)
+            if not min_stack or num<=min_stack[-1]:
+                min_stack.append(num)
+    except EOFError:
+        break
+
+```
+代码运行截图 
+
+### 20106: 走山路
+Dijkstra, http://cs101.openjudge.cn/practice/20106/
+思路：最短路径类题目，在以往bfs基础上改用优先队列，暂时还没彻底搞明白区别，写法细节上与以往常规bfs不一样，inq在push时add会WA，在pop时add就能解决。此外没有做起点终点不为“#”的判断会RE。
+代码：
+```
+from heapq import heappush, heappop
+m,n,p=map(int,input().split())
+graph=[]for i in range(m):
+    graph.append(list(input().split()))
+
+direction=[(0,1),(0,-1),(1,0),(-1,0)]def bfs(x1,y1,x2,y2):
+    q=[(0,x1,y1)]
+    inq=set()
+    while q:
+        deplete,x,y=heappop(q)
+        if (x,y) in inq:
+            continue
+        inq.add((x,y))
+        if (x,y)==(x2,y2):
+            return deplete
+        for dx,dy in direction:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<m and 0<=ny<n and (nx,ny) not in inq:
+                if graph[nx][ny]!="#":
+                    heappush(q,(deplete+abs(int(graph[nx][ny])-int(graph[x][y])),nx,ny))
+    return "NO"for _ in range(p):
+    a,b,i,j=map(int,input().split())
+    if graph[i][j]=="#" or graph[a][b]=="#":
+        print("NO")
+        continue
+    print(bfs(a,b,i,j))
+
+```
+代码运行截图
+### 04129: 变换的迷宫
+bfs, http://cs101.openjudge.cn/practice/04129/
+思路：在bfs基础上，step对k的不同余数建立不同的inq集合（地图可重复走，但同一位置在同一余数效果一致）
+代码：
+```
+from collections import deque
+t=int(input())def bfs(graph,r,c,k,x,y,x2,y2):
+    q=deque()
+    q.append((0,x,y))
+    inq=[]
+    for _ in range(k):
+        inq.append(set())
+    inq[0].add((x,y))
+    while q:
+        step,x,y=q.popleft()
+        if x==x2 and y==y2:
+            return step
+        for dx,dy in [(1,0),(0,1),(-1,0),(0,-1)]:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<r and 0<=ny<c and (nx,ny) not in inq[(step+1)%k]:
+                if (step+1)%k==0:
+                    q.append((step+1,nx,ny))
+                    inq[(step+1)%k].add((nx,ny))
+                else:
+                    if graph[nx][ny]!="#":
+                        q.append((step+1,nx,ny))
+                        inq[(step+1)%k].add((nx,ny))
+    return "Oop!"for i in range(t):
+    r,c,k=map(int,input().split())
+    graph=[input() for j in range(r)]
+    x1,y1,x2,y2=-1,-1,-1,-1
+    for j in range(r):
+        for l in range(c):
+            if graph[j][l]=="S":
+                x1,y1=j,l
+            elif graph[j][l]=="E":
+                x2,y2=j,l
+    print(bfs(graph,r,c,k,x1,y1,x2,y2))
+
+```
+代码运行截图
+
+## 2. 学习总结和收获
+看到群里好多同学说作业简单，自己写起来感觉其实难度不小（qwq），dp经常脑子转不过弯，快速填猪已经把stack写题面上了。两个搜索题其实都不简单，迪杰斯特拉还用不惯，之前遇到的相关题目用传统bfs都能做，还要仔细学习一下优先队列/堆的运用；变换的迷宫要把不同余数时间走过的路径分别记录，不太好想到。期末事情好多，要抓紧时间写完每日一练开始复习了。
