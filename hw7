@@ -1,0 +1,172 @@
+# Assignment #7: Nov Mock Exam 立冬
+Updated 1646 GMT+8 Nov 7, 2024
+2024 fall, Complied by <mark>同学的姓名、院系</mark>
+**说明：**
+1 ）月考： AC6<mark>（请改为同学的通过数）</mark> “AC3”。考试题目都在 题库（包括计概、数算题目） 里面，
+按照数字题号能找到，可以重新提交。作业中提交自己最满意版本的代码和截图。
+2）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截
+图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用
+word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+3）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提
+交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+4）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### E07618: 病人排队
+sorttings, http://cs101.openjudge.cn/practice/07618/
+思路：
+代码：
+```
+n=int(input())
+patients=[]for i in range(n):
+    patients.append(list(map(str,input().split())))
+
+judge=[]
+old=[]for i in range(n):
+    if int(patients[i][1])>=60:
+        old.append(patients[i])
+        judge.append(i)
+
+
+
+old=sorted(old,key=lambda x:int(x[1]),reverse=True)
+for i in range(len(old)):
+    print(old[i][0])
+for i in range(len(patients)):
+    if i not in judge:
+        print(patients[i][0])
+```
+代码运行截图 
+### E23555: 节省存储的矩阵乘法
+implementation, matrices, http://cs101.openjudge.cn/practice/23555/
+思路：
+代码：
+```
+n,m1,m2=map(int,input().split())
+a=[[0 for i in range(n)] for j in range(n)]
+b=[[0 for i in range(n)] for j in range(n)]for i in range(m1):
+    x,y,value=map(int,input().split())
+    a[x][y]=value
+for i in range(m2):
+    x,y,value=map(int,input().split())
+    b[x][y]=value
+
+matrix=[[0 for i in range(n)] for j in range(n)]for i in range(n):
+    for j in range(n):
+        for l in range(n):
+            matrix[i][j]+=a[i][l]*b[l][j]
+for i in range(n):
+    for j in range(n):
+        if matrix[i][j]:
+            print(i,j,matrix[i][j])
+
+```
+代码运行截图 ==
+==
+### M18182: 打怪兽
+implementation/sortings/data structures, http://cs101.openjudge.cn/practice/18182/
+思路：
+代码：
+```
+times=int(input())for i in range(times):
+    n,m,b=map(int,input().split())
+    skills={}
+    keys=[]
+    for j in range(n):
+        temp=list(map(int,input().split()))
+        if temp[0] not in keys:
+            keys.append(temp[0])
+            skills[temp[0]]=[temp[1]]
+        else:
+            skills[temp[0]].append(temp[1])
+    keys.sort()
+    total_hurt=0
+    for j in range(len(keys)):
+        if len(skills[keys[j]])<=m:
+            total_hurt+=sum(skills[keys[j]])
+        else:
+            skills[keys[j]].sort(reverse=True)
+            total_hurt+=sum(skills[keys[j]][:m])
+        if total_hurt>=b:
+            print(keys[j])
+            break
+    else:
+        print("alive")
+
+```
+代码运行截图 
+### M28780: 零钱兑换 3
+dp, http://cs101.openjudge.cn/practice/28780/
+思路：
+代码：
+```
+n,m=map(int,input().split())
+value=list(map(int,input().split()))
+dp=[0]+[float('inf')]*mfor i in range(1,m+1):
+    for j in value:
+        if i>=j:
+            dp[i]=min(dp[i],dp[i-j]+1)if dp[m]==float('inf'):
+    print(-1)else:
+    print(dp[m])
+
+```
+代码运行截图
+### T12757: 阿尔法星人翻译官
+implementation, http://cs101.openjudge.cn/practice/12757
+思路：
+代码：
+```
+english=list(input().split())
+translated={'zero':0, 'one':1, 'two':2, 'three':3, 'four':4, 'five':5, 'six':6, 'seven':7, 'eight':8, 'nine':9, 'ten':10, 'eleven':11, 'twelve':12, 'thirteen':13, 'fourteen':14, 'fifteen':15, 'sixteen':16, 'seventeen':17, 'eighteen':18, 'nineteen':19,'twenty':20, 'thirty':30, 'forty':40, 'fifty':50, 'sixty':60, 'seventy':70, 'eighty':80, 'ninety':90}
+judge=['thousand','million','end']if english[0]=='negative':
+    print('-', end='')
+    english.pop(0)
+scan=0
+result=0while scan<len(english):
+    temp=[]
+    while english[scan] not in judge:
+        temp.append(english[scan])
+        scan+=1
+        if scan==len(english):
+            english.append('end')
+            break
+    temp.append(english[scan])
+    scan+=1
+    sum_temp=0
+    for i in range(len(temp)-1):
+        if temp[i]=='hundred':
+            sum_temp*=100
+        else:
+            sum_temp+=translated[temp[i]]
+
+    if temp[-1]=='thousand':
+        result+=sum_temp*1000
+    elif temp[-1]=='million':
+        result+=sum_temp*1000000
+    elif temp[-1]=='end':
+        result+=sum_temp
+print(str(result))
+
+```
+代码运行截图
+### T16528: 充实的寒假生活
+greedy/dp, cs10117 Final Exam, http://cs101.openjudge.cn/practice/16528/
+思路：
+代码：
+```
+n=int(input())
+activity=[]for i in range(n):
+    activity.append(list(map(int,input().split())))
+
+activity.sort(key=lambda x:x[1])
+count=1
+end=activity[0][1]for i in range(1,n):
+    if activity[i][0]>end:
+        count+=1
+        end=activity[i][1]
+print(count)
+
+```
+代码运行截图
+## 2. 学习总结和收获
+月考ac3，写的速度比较慢，第一题审题不仔细，浪费了点时间，打怪兽开始没细想，先是遍历了t，后来发现t<10e9，后直接扫描，但是有点着急，当时没找到错点，先做了最后一题。零钱兑换来不及看，最优解题虽然还没完全理解，但是先记住了（hhhh）。还是要先仔细审题，注意参数范围，整理好思路，走错方向太浪费时间了。
+期中结束，每日一练差不多快跟上了。
