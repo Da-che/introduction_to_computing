@@ -1,0 +1,148 @@
+# Assignment #6: Recursion and DP
+Updated 2201 GMT+8 Oct 29, 2024
+2024 fall, Complied by 陈宣之 生命科学学院
+**说明：**
+1）请把每个题目解题思路（可选），源码 Python, 或者 C++（已经在 Codeforces/Openjudge 上 AC），截图（包含 Accepted ），填写到下面作业模版中（推荐使用 typora https://typoraio.cn ，或者用word）。AC 或者没有 AC，都请标上每个题目大致花费时间。
+3）提交时候先提交 pdf 文件，再把 md 或者 doc “ ”文件上传到右侧 作业评论 。Canvas 需要有同学清晰头像、提交文件有 pdf、"作业评论"区有上传的 md 或者 doc 附件。
+4）如果不能在截止前提交作业，请写明原因。
+## 1. 题目
+### sy119: 汉诺塔
+recursion, https://sunnywhy.com/sfbj/4/3/119
+思路：
+代码：
+```
+def move_disk(fp,tp):
+    print(fp,"->",tp,sep="")
+
+def move_tower(height,from_pole,with_pole,to_pole):
+    if height>=1:
+        move_tower(height-1,from_pole,to_pole,with_pole)
+        move_disk(from_pole,to_pole)
+        move_tower(height-1,with_pole,from_pole,to_pole)
+
+n=int(input())
+print(2**n-1)
+move_tower(n,"A","B","C")
+
+```
+代码运行截图 
+### sy132: 全排列 I
+recursion, https://sunnywhy.com/sfbj/4/3/132
+思路：
+代码：
+```
+n=int(input())
+
+judge=[False]*(n+1)
+def all_arrangements(n,temp=[]):
+    if len(temp)==n:
+        print(' '.join(map(str,temp)))
+        return temp
+    for i in range(1,n+1):
+        if not judge[i]:
+            judge[i]=True
+            all_arrangements(n,temp+[i])
+            judge[i]=False
+    return 0
+
+all_arrangements(n)
+
+```
+代码运行截图 
+====
+### 02945: 拦截导弹
+dp, http://cs101.openjudge.cn/2024fallroutine/02945
+思路：
+代码：
+```
+n=int(input())
+attack=list(map(int,input().split()))
+
+dp=[1]*(n+1)for i in range(1,n):
+    for j in range(i):
+        if attack[j]>=attack[i]:
+            dp[i]=max(dp[i],dp[j]+1)
+print(max(dp))
+
+```
+代码运行截图 
+
+### 23421: 小偷背包
+dp, http://cs101.openjudge.cn/practice/23421
+思路：
+代码：
+```
+n,b=map(int,input().split())
+price=list(map(int,input().split()))
+weight=list(map(int,input().split()))
+dp=[0]*(b+1)
+temp=[0]*(b+1)for j in range(n):
+    for i in range(1,b+1):
+        if weight[j]<=i:
+            temp[i]=max(dp[i],dp[i-weight[j]]+price[j])
+    dp=temp.copy()print(dp[-1])
+```
+代码运行截图 
+
+### 02754: 八皇后
+dfs and similar, http://cs101.openjudge.cn/practice/02754
+思路：
+代码：
+```
+穷举
+from itertools import permutations
+eight_queens=[]for i in permutations([1,2,3,4,5,6,7,8],8):
+    judge=True
+    for j in range(8):
+        for k in range(0,j):
+            if abs(i[j]-i[k])==abs(j-k):
+                judge=False
+                break
+    if judge:
+        eight_queens.append(i)
+
+
+n=int(input())for i in range(n):
+    b=int(input())
+    print(''.join(map(str,eight_queens[b-1])))
+
+```
+递归
+judge=[False]*9
+result=[]def eight_queens(prefix=[]):
+    if len(prefix)==8:
+        result.append(prefix)
+        return
+    for k in range(1,9):
+        if not judge[k] and \
+                all(abs(prefix[j]-k)!=abs(j-len(prefix)) for j in range(len(prefix))):
+            judge[k]=True
+            eight_queens(prefix+[k])
+            judge[k]=False
+eight_queens()
+
+n=int(input())for i in range(n):
+    b=int(input())
+    print(''.join(map(str,result[b-1])))
+
+```
+
+代码运行截图
+
+
+### 189A. Cut Ribbon
+brute force, dp 1300 https://codeforces.com/problemset/problem/189/A
+思路：
+代码：
+```
+n,a,b,c=map(int,input().split())
+dp=[0]+[-float('inf')]*n
+for i in range(1,n+1):
+    for j in (a,b,c):
+        if i>=j:
+            dp[i]=max(dp[i],dp[i-j]+1)
+print(dp[n])
+```
+代码运行截图 
+## 2. 学习总结和收获
+第一次接触递归和动态规划，感觉很新奇，花了两天才大概看明白全排列，又用一天多看懂了dp的经典例子，但是还是没有建立相关的思维模式，作业题还是照着课上讲的写，暂时做不到自己想出状态转移的逻辑
